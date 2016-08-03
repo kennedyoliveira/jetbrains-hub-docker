@@ -23,4 +23,8 @@ if [ -n "$JETBRAINS_HUB_JVM_OPTIONS" ] && [ ! -f $SETUP_FILE ]; then
     touch $SETUP_FILE
 fi
 
+# Fix user/group permissions
+chown -R $APP_USER:$APP_USER $HUB_HOME $HUB_DATA_DIR
+chmod 740 -R $HUB_HOME $HUB_DATA_DIR
+
 exec $EXECUTABLE run --no-browser
