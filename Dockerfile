@@ -6,11 +6,6 @@ ENV HUB_BASE_DIR /opt/jetbrains-hub
 ENV HUB_HOME $HUB_BASE_DIR/hub-ring-bundle-$HUB_VERSION
 ENV HUB_DATA_DIR /var/lib/jetbrains-hub
 ENV HUB_PORT 8080
-ENV APP_USER hub
-
-# Creates users and groups
-RUN groupadd --system $APP_USER
-RUN useradd --system -g $APP_USER -d $HUB_HOME $APP_USER
 
 # Creates the dir to hold the persistent data
 RUN mkdir -p $HUB_HOME $HUB_DATA_DIR
@@ -19,8 +14,7 @@ RUN mkdir -p $HUB_HOME $HUB_DATA_DIR
 COPY ["docker-entrypoint.sh", "/opt/jetbrains-hub/"]
 
 # Fix permissions
-RUN chown -R $APP_USER:$APP_USER $HUB_HOME $HUB_DATA_DIR && \
-    chmod 740 -R $HUB_HOME $HUB_DATA_DIR
+RUN chmod 755 /opt/jetbrains-hub/docker-entrypoint.sh
 
 RUN apt-get update && apt-get install -y \
             openjdk-8-jre-headless \
@@ -29,11 +23,8 @@ RUN apt-get update && apt-get install -y \
     wget https://download.jetbrains.com/hub/2.0/hub-ring-bundle-${HUB_VERSION}.zip -O /tmp/hub.zip && \
     unzip /tmp/hub.zip -d $HUB_BASE_DIR/ && \
     rm -rf /tmp/hub.zip && \
-    rm -rf $HUB_HOME/internal/java && \
-    chown -R $APP_USER:$APP_USER $HUB_HOME && \
-    chmod -R 740 $HUB_HOME
+    rm -rf $HUB_HOME/internal/java
 
-USER $APP_USER
 WORKDIR $HUB_HOME/
 
 # Basic configuration for hub
